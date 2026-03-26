@@ -27,7 +27,8 @@ const createDynamoDBClient = () => {
         case Environment.AWS:
             return new DaxDocument({ 
                 region: process.env.REGION,
-                endpoint: process.env.CUSTOMER_TABLE_CACHE_ENDPOINT
+                // endpoint: process.env.CUSTOMER_TABLE_CACHE_ENDPOINT
+                endpoint: 'dax://caching-dax-cache.lnccxi.dax-clusters.us-east-1.amazonaws.com'
             });
         default:
             throw new Error('Invalid environment value [ ' + process.env.ENVIRONMENT + ' ].');
