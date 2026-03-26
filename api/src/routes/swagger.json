@@ -104,8 +104,8 @@
 		"securitySchemes": {}
 	},
 	"info": {
-		"title": "caching-dax-api",
-		"version": "1.0.3",
+		"title": "caching-api",
+		"version": "1.0.0",
 		"contact": {}
 	},
 	"paths": {

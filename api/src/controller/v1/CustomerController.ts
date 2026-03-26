@@ -11,7 +11,8 @@ import {
   Tags
 } from "tsoa";
 import { UpdateCustomerMetadata } from "../../model/data/UpdateCustomerMetadata";
-import { customerService } from "../../service/Customer.service";
+import { customerServiceCacheAside } from "../../service/business-logic/customer/Customer.bls.cache-aside";
+import { customerServiceWriteThrough } from "../../service/business-logic/customer/Customer.bls.write-through";
 import { GetCustomerMetadata } from "../../model/data/GetCustomerMetadata";
 import { CreateCustomerMetadata } from "../../model/data/CreateCustomerMetadata";
 
@@ -24,7 +25,7 @@ export class CustomerController extends Controller {
     @Path() id: string
   ): Promise<GetCustomerMetadata> {
     this.setStatus(200);
-    return customerService.getCustomer(id);
+    return customerServiceWriteThrough.getCustomer(id);
   }
 
   @Post()
@@ -32,7 +33,7 @@ export class CustomerController extends Controller {
     @Body() CustomerMetadata: CreateCustomerMetadata
   ): Promise<GetCustomerMetadata> {
     this.setStatus(200);
-    return customerService.addCustomer(CustomerMetadata);
+    return customerServiceWriteThrough.addCustomer(CustomerMetadata);
   }
 
   @Put('{id}')
@@ -41,7 +42,7 @@ export class CustomerController extends Controller {
     @Body() CustomerMetadata: UpdateCustomerMetadata
   ): Promise<GetCustomerMetadata> {
     this.setStatus(200);
-    return customerService.updateCustomer(id, CustomerMetadata);
+    return customerServiceWriteThrough.updateCustomer(id, CustomerMetadata);
   }
 
   @Delete('{id}')
@@ -50,6 +51,6 @@ export class CustomerController extends Controller {
     @Query() version: number
   ): Promise<void> {
     this.setStatus(200);
-    return customerService.deleteCustomer(id, version);
+    return customerServiceWriteThrough.deleteCustomer(id, version);
   }
 }

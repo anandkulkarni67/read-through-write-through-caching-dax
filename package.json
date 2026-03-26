@@ -1,14 +1,14 @@
 {
-  "name": "caching-dax",
-  "version": "1.0.3",
-  "description": "Read through and write through caching implementation using DAX",
-  "homepage": "https://github.com/anandkulkarni67/read-through-write-through-caching-dax#readme",
+  "name": "caching",
+  "version": "1.0.0",
+  "description": "caching implementations",
+  "homepage": "https://github.com/anandkulkarni67/caching#readme",
   "bugs": {
-    "url": "https://github.com/anandkulkarni67/read-through-write-through-caching-dax/issues"
+    "url": "https://github.com/anandkulkarni67/caching/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/anandkulkarni67/read-through-write-through-caching-dax.git"
+    "url": "git+https://github.com/anandkulkarni67/caching.git"
   },
   "license": "ISC",
   "author": "",
