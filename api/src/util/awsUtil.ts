@@ -1,3 +1,4 @@
+import { Dax } from '@amazon-dax-sdk/client-dax';
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient } from "@aws-sdk/lib-dynamodb";
 import { getEnvironment } from '../util/environment';
@@ -24,7 +25,8 @@ const createDynamoDBClient = () => {
                 },
             });
         case Environment.AWS:
-            return new DynamoDBClient({
+            return new Dax({
+                endpoint: process.env.CUSTOMER_TABLE_CACHE_ENDPOINT,
                 region: process.env.REGION
             });
         default:
