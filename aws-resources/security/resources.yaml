@@ -54,7 +54,7 @@ Resources:
   CustomerTableCacheRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: !Join [ '-', [ !Ref ApplicationName, 'api']]
+      RoleName: !Join [ '-', [ !Ref ApplicationName, 'cache']]
       Description: 'An IAM role to allow lambda invocation'
       AssumeRolePolicyDocument:
         Version: 2012-10-17
