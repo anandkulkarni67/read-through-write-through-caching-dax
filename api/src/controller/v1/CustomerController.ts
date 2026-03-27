@@ -10,22 +10,29 @@ import {
   Route,
   Tags
 } from "tsoa";
-import { UpdateCustomerMetadata } from "../../model/data/UpdateCustomerMetadata";
-import { customerServiceCacheAside } from "../../service/business-logic/customer/Customer.bls.cache-aside";
-import { customerServiceWriteThrough } from "../../service/business-logic/customer/Customer.bls.write-through";
-import { GetCustomerMetadata } from "../../model/data/GetCustomerMetadata";
-import { CreateCustomerMetadata } from "../../model/data/CreateCustomerMetadata";
+import { UpdateCustomerMetadata } from "../../model/data/customer/UpdateCustomerMetadata";
+import { GetCustomerMetadata } from "../../model/data/customer/GetCustomerMetadata";
+import { CreateCustomerMetadata } from "../../model/data/customer/CreateCustomerMetadata";
+import { CustomerService } from "../../service/business-logic/customer/CustomerService";
+import { CustomerServiceCachingTechniquesFactory } from "../../service/business-logic/customer/CustomerServiceFactory";
 
 @Tags("Customers")
 @Route("/v1/customers")
 export class CustomerController extends Controller {
+
+  customerService: CustomerService<string>;
+
+  constructor() {
+    super();
+    this.customerService = CustomerServiceCachingTechniquesFactory.getCustomerServiceInstance();
+  }
 
   @Get('{id}')
   public async getCustomer(
     @Path() id: string
   ): Promise<GetCustomerMetadata> {
     this.setStatus(200);
-    return customerServiceWriteThrough.getCustomer(id);
+    return this.customerService.getCustomer(id);
   }
 
   @Post()
@@ -33,7 +40,7 @@ export class CustomerController extends Controller {
     @Body() CustomerMetadata: CreateCustomerMetadata
   ): Promise<GetCustomerMetadata> {
     this.setStatus(200);
-    return customerServiceWriteThrough.addCustomer(CustomerMetadata);
+    return this.customerService.addCustomer(CustomerMetadata);
   }
 
   @Put('{id}')
@@ -42,7 +49,7 @@ export class CustomerController extends Controller {
     @Body() CustomerMetadata: UpdateCustomerMetadata
   ): Promise<GetCustomerMetadata> {
     this.setStatus(200);
-    return customerServiceWriteThrough.updateCustomer(id, CustomerMetadata);
+    return this.customerService.updateCustomer(id, CustomerMetadata);
   }
 
   @Delete('{id}')
@@ -51,6 +58,6 @@ export class CustomerController extends Controller {
     @Query() version: number
   ): Promise<void> {
     this.setStatus(200);
-    return customerServiceWriteThrough.deleteCustomer(id, version);
+    return this.customerService.deleteCustomer(id, version);
   }
 }

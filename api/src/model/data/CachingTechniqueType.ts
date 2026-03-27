@@ -1,0 +1,8 @@
+export enum CachingTechniqueType {
+
+    CACHE_ASIDE="CACHE_ASIDE",
+    WRITE_THROUGH="WRITE_THROUGH",
+    READ_THROUGH="READ_THROUGH",
+    WRITE_BEHIND="WRITE_BEHIND"
+
+}

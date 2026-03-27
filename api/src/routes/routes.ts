@@ -39,8 +39,8 @@ const models: TsoaRoute.Models = {
         "properties": {
             "firstname": {"dataType":"string","required":true},
             "lastname": {"dataType":"string","required":true},
-            "customerId": {"dataType":"string","required":true},
             "version": {"dataType":"double","required":true},
+            "id": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
     },

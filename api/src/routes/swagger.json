@@ -46,19 +46,19 @@
 					"lastname": {
 						"type": "string"
 					},
-					"customerId": {
-						"type": "string"
-					},
 					"version": {
 						"type": "number",
 						"format": "double"
+					},
+					"id": {
+						"type": "string"
 					}
 				},
 				"required": [
 					"firstname",
 					"lastname",
-					"customerId",
-					"version"
+					"version",
+					"id"
 				],
 				"type": "object",
 				"additionalProperties": false

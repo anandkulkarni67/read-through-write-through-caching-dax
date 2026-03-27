@@ -1,27 +1,29 @@
-import { UpdateCustomerMetadata } from '../../../model/data/UpdateCustomerMetadata';
-import { dynamoDBDocumentClient } from '../../../util/awsUtil';
-import { daysinFuture } from '../../../util/dataTime';
+import { UpdateCustomerMetadata } from '../../../../model/data/customer/UpdateCustomerMetadata';
+import { dynamoDBDocumentClient } from '../../../../util/awsUtil';
+import { daysinFuture } from '../../../../util/dataTime';
 import { PutCommand, UpdateCommand, DeleteCommand, GetCommand } from "@aws-sdk/lib-dynamodb";
 import { randomUUID } from 'crypto';
-import { NotFound } from '../../../model/error/NotFound';
-import { ResourceConflict } from '../../../model/error/ResourceConflict';
-import { GetCustomerMetadata } from '../../../model/data/GetCustomerMetadata';
-import { CreateCustomerMetadata } from '../../../model/data/CreateCustomerMetadata';
+import { NotFound } from '../../../../model/error/NotFound';
+import { ResourceConflict } from '../../../../model/error/ResourceConflict';
+import { GetCustomerMetadata } from '../../../../model/data/customer/GetCustomerMetadata';
+import { CreateCustomerMetadata } from '../../../../model/data/customer/CreateCustomerMetadata';
+import { DataAccessService } from '../DataAccessService';
+import { CustomerMetadata } from '../../../../model/data/customer/CustomerMetadata';
 
-class CustomerDataAccessService {
+class CustomerDataAccessService implements DataAccessService<string, CustomerMetadata, GetCustomerMetadata> {
 
     public async addCustomer(metadata: CreateCustomerMetadata): Promise<GetCustomerMetadata> {
         try {
-            const customerId = randomUUID();
+            const id = randomUUID();
             const customerMetadata = {
                 ...metadata,
-                customerId,
+                id,
                 version: 1
             };
             const command = new PutCommand({
                 TableName: process.env.CUSTOMER_TABLE_NAME,
                 Item: {
-                    CustomerId: customerId,
+                    CustomerId: id,
                     Metadata: customerMetadata,
                     Version: customerMetadata.version,
                     Ttl: daysinFuture(Number(process.env.DYNAMO_DB_TTL_DAYS))
@@ -34,17 +36,17 @@ class CustomerDataAccessService {
         }
     }
 
-    public async updateCustomer(customerId: string, metadata: UpdateCustomerMetadata): Promise<GetCustomerMetadata> {
+    public async updateCustomer(id: string, metadata: UpdateCustomerMetadata): Promise<GetCustomerMetadata> {
         try {
             const customerMetadata = {
                 ...metadata,
-                customerId,
+                id,
                 version: metadata.version + 1
             };
             const command = new UpdateCommand({
                 TableName: process.env.CUSTOMER_TABLE_NAME,
                 Key: {
-                    CustomerId: customerId,
+                    CustomerId: id,
                 },
                 UpdateExpression: "set Version = :newversion, metadata = :metadata", // optimitstic locking using version checks.
                 ConditionExpression: "Version = :currentVersion",
@@ -61,22 +63,22 @@ class CustomerDataAccessService {
             if (error.message && error.message == 'The conditional request failed') {
                 if (error.Item) {
                     if ( error.Item.Version.N != metadata.version) {
-                        throw new ResourceConflict('State conflict for the Customer record [ customerId: ' + customerId + ' ]')
+                        throw new ResourceConflict('State conflict for the Customer record [ id: ' + id + ' ]')
                     }
                 } else {
-                    throw new NotFound('Customer with [ customerId: ' + customerId + ' ] not found.');
+                    throw new NotFound('Customer with [ id: ' + id + ' ] not found.');
                 }
             }
             throw error;
         }
     }
 
-    public async deleteCustomer(customerId: String, version: number): Promise<void> {
+    public async deleteCustomer(id: String, version: number): Promise<void> {
         try {
             const command = new DeleteCommand({
                 TableName: process.env.CUSTOMER_TABLE_NAME,
                 Key: {
-                    CustomerId: customerId
+                    CustomerId: id
                 },
                 ConditionExpression: "Version = :currentVersion", // optimitstic locking using version checks.
                 ExpressionAttributeValues: {
@@ -89,22 +91,22 @@ class CustomerDataAccessService {
             if (error.message && error.message == 'The conditional request failed') {
                 if (error.Item) {
                     if ( error.Item.Version.N != version) {
-                        throw new ResourceConflict('State conflict for the Customer record [ customerId: ' + customerId + ' ]')
+                        throw new ResourceConflict('State conflict for the Customer record [ id: ' + id + ' ]');
                     }
                 } else {
-                    throw new NotFound('Customer with [ customerId: ' + customerId + ' ] not found.');
+                    throw new NotFound('Customer with [ id: ' + id + ' ] not found.');
                 }
             }
             throw error;
         }
     }
 
-    public async getCustomer(customerId: String): Promise<GetCustomerMetadata> {
+    public async getCustomer(id: String): Promise<GetCustomerMetadata> {
         try {
             const command = new GetCommand({
                 TableName: process.env.CUSTOMER_TABLE_NAME,
                 Key: {
-                    CustomerId: customerId
+                    CustomerId: id
                 }
             });
             const data = await dynamoDBDocumentClient.send(command);
@@ -115,7 +117,7 @@ class CustomerDataAccessService {
                 };
                 return customerMetadata;
             }
-            throw new NotFound('Customer [id: ' + customerId + '] not found.');
+            throw new NotFound('Customer [id: ' + id + '] not found.');
         } catch (error: any) {
             throw error;   
         }
@@ -123,4 +125,4 @@ class CustomerDataAccessService {
 
 }
 
-export const customerDataAceessService = new CustomerDataAccessService();
+export const customerDataAccessService = new CustomerDataAccessService();
