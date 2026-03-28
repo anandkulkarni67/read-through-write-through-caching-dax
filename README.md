@@ -1,4 +1,4 @@
-# Caching techniques implementation using in-memory cache and dynamodb with generics and event emitters in Typescript.
+# Caching techniques using in-memory cache, dynamodb with generics and event emitters in Typescript.
 
 ## Change directory to API
 ```
